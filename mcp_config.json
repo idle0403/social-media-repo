@@ -1,9 +1,19 @@
 {
   "mcpServers": {
-    "date-parser": {
+    "notion-weather": {
       "command": "python",
-      "args": ["server.py"],
-      "cwd": "/Users/paul/Documents/venv/social-media"
+      "args": ["/Users/paul/Documents/venv/social-media-repo/notion_weather_server.py"],
+      "env": {
+        "NOTION_TOKEN": "secret_your_notion_integration_token",
+        "OPENWEATHER_API_KEY": "your_openweather_api_key"
+      }
+    },
+    "weather-analyzer": {
+      "command": "python", 
+      "args": ["/Users/paul/Documents/venv/social-media-repo/weather_mcp_server.py"],
+      "env": {
+        "OPENWEATHER_API_KEY": "your_openweather_api_key"
+      }
     }
   }
 }

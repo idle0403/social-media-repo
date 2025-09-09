@@ -1,2 +1,8 @@
 mcp
 python-dateutil
+aiohttp
+streamlit
+plotly
+pandas
+slack-sdk
+python-dotenv

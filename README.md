@@ -23,9 +23,9 @@ graph TB
         MA[Main App]
     end
     
-    subgraph "🧠 AI Integration"
-        CLAUDE[Claude Desktop]
-        QCHAT[Q Chat]
+    subgraph "🤖 AI Integration"
+        QCHAT[Q Chat Interface]
+        QS[Q Chat Server]
     end
     
     subgraph "📊 Data Flow"
@@ -34,8 +34,9 @@ graph TB
         NS --> |Notion 저장| CLAUDE
         WD --> |시각화| USER[👤 사용자]
         SA --> |Slack 전송| SLACK
-        CLAUDE --> |MCP 연동| WS
-        CLAUDE --> |MCP 연동| NS
+        QCHAT --> |질의응답| QS
+        QS --> |MCP 연동| WS
+        QS --> |MCP 연동| NS
     end
     
     OW --> WS
@@ -45,33 +46,43 @@ graph TB
     style WS fill:#e1f5fe
     style NS fill:#f3e5f5
     style WD fill:#e8f5e8
-    style CLAUDE fill:#fff3e0
+    style QCHAT fill:#fff3e0
+    style QS fill:#e3f2fd
 ```
 
-## 🔄 워크플로우
+## 🔄 Q Chat 워크플로우
 
 ```mermaid
 sequenceDiagram
     participant U as 👤 사용자
-    participant C as 🧠 Claude
-    participant M as 🤖 MCP Server
+    participant Q as 🤖 Q Chat
+    participant M as 🔧 MCP Server
+    participant W as 🌐 Weather API
     participant N as 📝 Notion
     participant S as 💬 Slack
-    participant W as 🌐 Weather API
     
-    U->>C: "서울 날씨 분석해서 Notion에 저장해줘"
-    C->>M: MCP 도구 호출
-    M->>W: 날씨 데이터 요청
-    W-->>M: 날씨 정보 응답
-    M->>M: 데이터 분석 처리
-    M->>N: 분석 결과 저장
-    N-->>M: 저장 완료
-    M-->>C: 결과 반환
-    C-->>U: "✅ Notion에 저장 완료!"
+    U->>Q: "서울 날씨 어때?"
+    Q->>M: 질의 분석 요청
+    M->>W: 날씨 데이터 수집
+    W-->>M: 실시간 날씨 정보
+    M->>M: 질문 유형 분석
+    M-->>Q: 맞춤형 답변 생성
+    Q-->>U: "서울 현재 18°C, 맑음입니다"
     
-    opt Slack 알림
-        M->>S: 분석 결과 전송
-        S-->>U: 📱 알림 수신
+    opt 추가 요청
+        U->>Q: "이 정보 Notion에 저장해줘"
+        Q->>M: 저장 요청
+        M->>N: 구조화된 데이터 저장
+        N-->>M: 저장 완료
+        M-->>Q: 저장 결과
+        Q-->>U: "✅ Notion에 저장했습니다"
+    end
+    
+    opt 공유 요청
+        U->>Q: "팀에게 공유해줘"
+        Q->>M: 공유 요청
+        M->>S: 포맷된 메시지 전송
+        S-->>U: 📱 팀 알림
     end
 ```
 
@@ -284,13 +295,13 @@ streamlit run web_dashboard.py
 
 ### 🔧 일반적인 문제
 
-#### MCP 서버 연결 실패
+#### Q Chat 서버 연결 실패
 ```bash
 # 해결방법
-1. Claude Desktop 설정 파일 경로 확인
-2. JSON 문법 오류 검사
+1. Q Chat 서버 실행 상태 확인
+2. MCP 서버 포트 충돌 검사
 3. Python 경로 및 파일 경로 확인
-4. Claude Desktop 완전 재시작
+4. 서버 재시작
 ```
 
 #### API 인증 오류
@@ -325,8 +336,11 @@ python -c "import logging; logging.basicConfig(level=logging.DEBUG)"
 # 환경변수 확인
 env | grep -E '(NOTION|SLACK|OPENWEATHER)'
 
-# MCP 서버 직접 테스트
-python notion_weather_server.py
+# Q Chat 서버 직접 테스트
+python qchat_weather_server.py
+
+# Q Chat 인터페이스 테스트
+python test_qchat.py
 ```
 
 ## 🚀 다음 단계

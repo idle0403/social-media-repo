@@ -1,3 +1,48 @@
+```mermaid
+flowchart LR
+  User[User / External System]
+  UI[Notion UI / Notion Pages]
+  subgraph Notion
+    N_DB[Databases: Agents / Tasks / Memories / Templates / Logs]
+  end
+
+  subgraph MCP_Backend["MCP Backend (Orchestrator)"]
+    API[REST / GraphQL API]
+    Scheduler[Scheduler / Queue]
+    Planner[Planner / Decomposer]
+    AgentPool[Agent Runner Pool]
+    Exec[Executor (Tool Gateway)]
+    AuthZ[Auth & Policy Engine]
+    Cache[Cache / Local Store]
+    Logger[Observability / Audit]
+  end
+
+  subgraph Infra["Supporting Services"]
+    VDB[Vector DB (embeddings)]
+    LLM[LLM Provider(s)]
+    Tools[External Tools & APIs]
+    Vault[Secrets / KeyVault]
+    TaskQueue[Message Queue (e.g. Redis/RabbitMQ)]
+  end
+
+  User -->|Create/Approve task| UI
+  UI -->|via Notion API| N_DB
+  N_DB -->|webhook / poll| API
+  API --> Scheduler
+  Scheduler -->|enqueue| TaskQueue
+  TaskQueue --> AgentPool
+  AgentPool --> Planner
+  Planner --> VDB
+  Planner --> LLM
+  AgentPool --> Exec
+  Exec --> Tools
+  Exec --> LLM
+  Exec -->|write result| N_DB
+  AuthZ --> AgentPool
+  Logger --> N_DB
+  Vault --> Exec
+```
+
 # 🌤️ 날씨 분석 시스템
 
 MCP(Model Context Protocol)를 활용한 종합 날씨 분석 및 자동화 시스템
